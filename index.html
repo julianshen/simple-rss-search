@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/bs/css/bootstrap.css">
+	<link rel="stylesheet" href="/bs/css/bootstrap-glyphicons.css">
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<link type="text/css" rel="stylesheet" href="https://www.gstatic.com/freebase/suggest/4_2/suggest.min.css" />
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
+	<script type="text/javascript" src="https://www.gstatic.com/freebase/suggest/4_2/suggest.min.js"></script>
+
+	<style type="text/css">
+		.navbar
+		{
+    		background-color: #2f3f6f;
+		}
+	</style>
+
+	<title></title>
+
+	<script>
+		google.load("feeds", "1");
+
+		function initialize() {
+			var input = document.querySelector('#search-keyword');
+			var search_btn = document.querySelector('#search-btn');
+
+			input.disabled = false;
+			search_btn.disabled = false;
+		}
+
+		function findImage(str) {
+			var doc = document.implementation.createHTMLDocument("");
+    		doc.body.innerHTML = str;
+
+    		var img = doc.querySelector('img');
+    		return img;
+		}
+
+		function doSearch() {
+			var input = document.querySelector('#search-keyword');
+			
+			if (input.value != '') {
+				var query = input.value;
+				google.feeds.findFeeds(query, function(result) {
+					// Get content div
+    				var content = document.getElementById('content');
+    				content.innerHTML = '';
+
+    				// Loop through the results and print out the title of the feed and link to
+    				// the url.
+    				for (var i = 0; i < result.entries.length; i++) {
+      					var entry = result.entries[i];
+      					var panel = document.createElement('div');
+
+      					panel.className = 'panel panel-info';
+      					panel.style.margin = '1px';
+
+      					var html = '<div class="panel-heading"><div class="row"><h3 class="panel-title col-10">' + entry.title + '</h3><a href ="' + entry.url + '"><span class="glyphicon glyphicon-plus col-1 pull-right"></span></a></div></div>';
+      					html += entry.contentSnippet;
+
+      					panel.innerHTML = html;
+      					
+      					content.appendChild(panel);
+    				}
+    				
+				});
+			};
+		}
+
+		$(function() {
+  			$("#search-keyword").suggest({lang:"zh,en,ja,fr,es,ru"}).bind('fb-select', function(e, data) {
+  				doSearch();
+  			});
+		});
+
+
+		google.setOnLoadCallback(initialize);
+
+	</script>
+</head>
+<body>
+	<div class="navbar">
+		<div class="container pull-left">
+  			<a class="navbar-brand pull-left" href="#" style="color:#ffffff;">Search</a>
+  			<form class="navbar-form pull-left" onsubmit="doSearch(); return false;">
+  				<input id="search-keyword" class="form-control" placeholder="What to search?" style="width:200px" autofocus disabled>
+  				<button class="btn btn-default" type="submit" id="search-btn" disabled><span class="glyphicon glyphicon-search"></span></button>
+  			</form>
+		</div>
+	</div>
+
+		<div id="content" class="row"></div>
+</body>
+</html>
